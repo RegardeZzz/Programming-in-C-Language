@@ -1,0 +1,42 @@
+name: Diary Reports
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Воскресенье 21:00 Владивосток (UTC+10) = 11:00 UTC
+    - cron: "0 11 * * 0"
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate report
+        run: python scripts/generate_report.py
+
+      - name: Commit reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add reports/*.md reports/README.md
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+          git commit -m "chore: weekly diary report"
+          git push
