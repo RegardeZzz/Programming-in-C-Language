@@ -15,7 +15,7 @@ int main()
 
         printf("X1 = %.2f\n", x1);
         printf("X2 = %.2f\n", x2);
-        printf("Two roots");
+        printf("Two root");
     }
 
     else if(d == 0)
